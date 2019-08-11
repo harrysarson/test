@@ -1,8 +1,8 @@
-module Test.Runner.Failure exposing (Reason(..), InvalidReason(..), format)
+module Test.Runner.Failure exposing (Reason(..), InvalidReason(..))
 
 {-| The reason a test failed.
 
-@docs Reason, InvalidReason, format
+@docs Reason, InvalidReason
 
 -}
 
@@ -54,73 +54,6 @@ verticalBar comparison expected actual =
     , expected
     ]
         |> String.join "\n"
-
-
-{-| DEPRECATED. In the future, test runners should implement versions of this
-that make sense for their own environments.
-
-Format test run failures in a reasonable way.
-
--}
-format : String -> Reason -> String
-format description reason =
-    case reason of
-        Custom ->
-            description
-
-        Equality e a ->
-            verticalBar description e a
-
-        Comparison e a ->
-            verticalBar description e a
-
-        TODO ->
-            description
-
-        Invalid BadDescription ->
-            if description == "" then
-                "The empty string is not a valid test description."
-
-            else
-                "This is an invalid test description: " ++ description
-
-        Invalid _ ->
-            description
-
-        ListDiff expected actual ->
-            listDiffToString 0
-                description
-                { expected = expected
-                , actual = actual
-                }
-                { originalExpected = expected
-                , originalActual = actual
-                }
-
-        CollectionDiff { expected, actual, extra, missing } ->
-            let
-                extraStr =
-                    if List.isEmpty extra then
-                        ""
-
-                    else
-                        "\nThese keys are extra: "
-                            ++ (extra |> String.join ", " |> (\d -> "[ " ++ d ++ " ]"))
-
-                missingStr =
-                    if List.isEmpty missing then
-                        ""
-
-                    else
-                        "\nThese keys are missing: "
-                            ++ (missing |> String.join ", " |> (\d -> "[ " ++ d ++ " ]"))
-            in
-            String.join ""
-                [ verticalBar description expected actual
-                , "\n"
-                , extraStr
-                , missingStr
-                ]
 
 
 toStringLists : List String -> String
